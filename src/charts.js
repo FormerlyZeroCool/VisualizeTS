@@ -93,25 +93,28 @@ function make_donut(container, width, height, data) {
     });
     // Create a container div to hold the canvas and key
     const containerDiv = document.createElement('div');
+    keyDiv.style.display = "none";
+    const show_key = (event) => {
+        keyDiv.style.display = "block";
+    };
+    const hide_key = (event) => {
+        keyDiv.style.display = "none";
+    };
     containerDiv.style.display = 'flex';
     // Append canvas and key to the container div
     containerDiv.appendChild(keyDiv);
     containerDiv.appendChild(canvas);
     // Append the container div to the provided div
     container.appendChild(containerDiv);
+    containerDiv.addEventListener("mouseover", show_key);
+    containerDiv.addEventListener("mouseout", hide_key);
     // Render the donut chart
     render_donut(canvas, data);
+    return canvas;
 }
 //sample main rendering a donut chart to an html canvas with an id screen
 function main() {
     return __awaiter(this, void 0, void 0, function* () {
-        const canvas = document.getElementById("screen");
-        let maybectx = canvas.getContext("2d");
-        if (!maybectx) {
-            console.log("error could not find canvas to render to!!!");
-            return;
-        }
-        const ctx = maybectx;
         let data = [
             {
                 "label": "Incomplete",
@@ -129,9 +132,11 @@ function main() {
                 "data": [12, 15, 21]
             }
         ];
+        const canvas = make_donut(document.getElementById('chart'), 500, 500, data);
+        const ctx = canvas.getContext("2d");
         const drawLoop = () => __awaiter(this, void 0, void 0, function* () {
-            //render_donut(canvas, data);
-            make_donut(document.getElementById('chart'), 500, 500, data);
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            render_donut(canvas, data);
             requestAnimationFrame(drawLoop);
         });
         drawLoop();

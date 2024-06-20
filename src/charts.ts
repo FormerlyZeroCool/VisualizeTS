@@ -70,7 +70,8 @@ function render_donut(canvas:HTMLCanvasElement, data:DataRecord[]):void
         start += delta;
     }
 }
-function make_donut(container: HTMLDivElement, width: number, height: number, data: DataRecord[]): void {
+function make_donut(container: HTMLDivElement, width: number, height: number, data: DataRecord[]): HTMLCanvasElement 
+{
     container.innerHTML = '';
     // Create the canvas
     const canvas = document.createElement('canvas');
@@ -108,6 +109,13 @@ function make_donut(container: HTMLDivElement, width: number, height: number, da
 
     // Create a container div to hold the canvas and key
     const containerDiv = document.createElement('div');
+    keyDiv.style.display = "none";
+    const show_key = (event:MouseEvent) => {
+            keyDiv.style.display = "block";
+    };
+    const hide_key = (event:MouseEvent) => {
+            keyDiv.style.display = "none";
+    };
     containerDiv.style.display = 'flex';
 
     // Append canvas and key to the container div
@@ -117,21 +125,16 @@ function make_donut(container: HTMLDivElement, width: number, height: number, da
     // Append the container div to the provided div
     container.appendChild(containerDiv);
 
+    containerDiv.addEventListener("mouseover", show_key);
+    containerDiv.addEventListener("mouseout", hide_key);
     // Render the donut chart
     render_donut(canvas, data);
+    return canvas;
 }
 
 //sample main rendering a donut chart to an html canvas with an id screen
 async function main()
 {
-    const canvas:HTMLCanvasElement = <HTMLCanvasElement> document.getElementById("screen");
-    let maybectx:CanvasRenderingContext2D | null = canvas.getContext("2d");
-    if(!maybectx)
-    {
-        console.log("error could not find canvas to render to!!!");
-        return;
-    }
-    const ctx:CanvasRenderingContext2D = maybectx;
     let data = [
       {
         "label": "Incomplete",
@@ -149,10 +152,12 @@ async function main()
         "data": [12, 15, 21]
       }
     ];
+    const canvas:HTMLCanvasElement = make_donut(document.getElementById('chart'), 500, 500, data);
+    const ctx:CanvasRenderingContext2D = canvas.getContext("2d")!;
     const drawLoop = async () => 
         {
-            //render_donut(canvas, data);
-            make_donut(document.getElementById('chart'), 500, 500, data);
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            render_donut(canvas, data);
             requestAnimationFrame(drawLoop);
         }
     drawLoop();
