@@ -29,9 +29,6 @@ function normalize_records(records) {
     return normalized;
 }
 function setup_text(ctx, width, height) {
-    ctx.font = `${width / 10}px Helvetica`;
-    ctx.fillStyle = "#FFFFFF";
-    ctx.fillRect(0, 0, width, height);
     ctx.fillStyle = "#000000";
     // Adding shadow to the text
     ctx.shadowColor = "rgba(0, 0, 0, 0.5)";
@@ -62,19 +59,48 @@ function render_donut(canvas, data) {
         const delta = normal.data * 2 * Math.PI;
         ctx.arc(x, y, radius, start, start + delta);
         ctx.stroke();
-        const mid_point = start + delta / 2;
-        const text_x = x + radius * Math.cos(mid_point);
-        const text_y = y + radius * Math.sin(mid_point);
-        const text_width = ctx.measureText(normal.label).width;
-        if (width - text_x < text_width) {
-            ctx.textAlign = "center";
-            ctx.fillText(normal.label, text_x, text_y, width - text_x + text_width / 2.8);
-            ctx.textAlign = "start";
-        }
-        else
-            ctx.fillText(normal.label, text_x, text_y, width - text_x);
         start += delta;
     }
+}
+function make_donut(container, width, height, data) {
+    container.innerHTML = '';
+    // Create the canvas
+    const canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+    // Create the key div
+    const keyDiv = document.createElement('div');
+    keyDiv.style.display = 'flex';
+    keyDiv.style.flexDirection = 'column';
+    keyDiv.style.marginLeft = '20px';
+    // Populate the key with labels and colors
+    data.forEach(record => {
+        const keyItem = document.createElement('div');
+        keyItem.style.display = 'flex';
+        keyItem.style.alignItems = 'center';
+        const colorBox = document.createElement('div');
+        colorBox.style.width = `${width / 10}px`;
+        colorBox.style.height = `${width / 10}px`;
+        colorBox.style.backgroundColor = record.color;
+        colorBox.style.marginRight = '10px';
+        colorBox.style.border = '1px solid #000'; // Add black border
+        const label = document.createElement('span');
+        label.textContent = record.label;
+        label.style.fontSize = `${width / 15}px`;
+        keyItem.appendChild(colorBox);
+        keyItem.appendChild(label);
+        keyDiv.appendChild(keyItem);
+    });
+    // Create a container div to hold the canvas and key
+    const containerDiv = document.createElement('div');
+    containerDiv.style.display = 'flex';
+    // Append canvas and key to the container div
+    containerDiv.appendChild(keyDiv);
+    containerDiv.appendChild(canvas);
+    // Append the container div to the provided div
+    container.appendChild(containerDiv);
+    // Render the donut chart
+    render_donut(canvas, data);
 }
 //sample main rendering a donut chart to an html canvas with an id screen
 function main() {
@@ -104,7 +130,8 @@ function main() {
             }
         ];
         const drawLoop = () => __awaiter(this, void 0, void 0, function* () {
-            render_donut(canvas, data);
+            //render_donut(canvas, data);
+            make_donut(document.getElementById('chart'), 500, 500, data);
             requestAnimationFrame(drawLoop);
         });
         drawLoop();
