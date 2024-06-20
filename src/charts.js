@@ -58,6 +58,7 @@ function render_donut(canvas, data) {
         ctx.strokeStyle = normal.color;
         const delta = normal.data * 2 * Math.PI;
         ctx.arc(x, y, radius, start, start + delta);
+        console.log(normal.data);
         ctx.stroke();
         start += delta;
     }
@@ -105,13 +106,12 @@ function make_donut(container, width, height, data) {
 //sample main rendering a donut chart to an html canvas with an id screen
 function main() {
     return __awaiter(this, void 0, void 0, function* () {
-        const canvas = document.getElementById("screen");
-        let maybectx = canvas.getContext("2d");
-        if (!maybectx) {
-            console.log("error could not find canvas to render to!!!");
+        let maybe_div = document.getElementById('chart');
+        if (!maybe_div) {
+            console.log("error could not find div to render to!!!");
             return;
         }
-        const ctx = maybectx;
+        const div = maybe_div;
         let data = [
             {
                 "label": "Incomplete",
@@ -129,13 +129,7 @@ function main() {
                 "data": [12, 15, 21]
             }
         ];
-        const drawLoop = () => __awaiter(this, void 0, void 0, function* () {
-            //render_donut(canvas, data);
-            make_donut(document.getElementById('chart'), 500, 500, data);
-            requestAnimationFrame(drawLoop);
-        });
-        drawLoop();
-        //while(true){drawLoop(); await sleep(10);}
+        make_donut(div, 500, 500, data);
     });
 }
 main();

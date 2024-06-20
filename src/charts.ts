@@ -124,14 +124,13 @@ function make_donut(container: HTMLDivElement, width: number, height: number, da
 //sample main rendering a donut chart to an html canvas with an id screen
 async function main()
 {
-    const canvas:HTMLCanvasElement = <HTMLCanvasElement> document.getElementById("screen");
-    let maybectx:CanvasRenderingContext2D | null = canvas.getContext("2d");
-    if(!maybectx)
+    let maybe_div:HTMLDivElement | null = document.getElementById('chart') as HTMLDivElement | null;
+    if(!maybe_div)
     {
-        console.log("error could not find canvas to render to!!!");
+        console.log("error could not find div to render to!!!");
         return;
     }
-    const ctx:CanvasRenderingContext2D = maybectx;
+    const div:HTMLDivElement = maybe_div;
     let data = [
       {
         "label": "Incomplete",
@@ -149,13 +148,6 @@ async function main()
         "data": [12, 15, 21]
       }
     ];
-    const drawLoop = async () => 
-        {
-            //render_donut(canvas, data);
-            make_donut(document.getElementById('chart'), 500, 500, data);
-            requestAnimationFrame(drawLoop);
-        }
-    drawLoop();
-    //while(true){drawLoop(); await sleep(10);}
+    make_donut(div, 500, 500, data);
 }
 main();
