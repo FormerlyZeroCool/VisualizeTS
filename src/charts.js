@@ -123,24 +123,24 @@ function main() {
             },
             {
                 "label": "Submitted",
-                "color": "#00FFFF",
+                "color": "#00FF00",
                 "data": [3, 9, 6]
             },
             {
                 "label": "Graded",
-                "color": "#00FF00",
+                "color": "#0000FF",
                 "data": [12, 15, 21]
             }
         ];
         const canvas = make_donut(document.getElementById('chart'), 500, 500, data);
-        const ctx = canvas.getContext("2d");
-        const drawLoop = () => __awaiter(this, void 0, void 0, function* () {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            render_donut(canvas, data);
-            requestAnimationFrame(drawLoop);
-        });
-        drawLoop();
-        //while(true){drawLoop(); await sleep(10);}
+        /*const ctx:CanvasRenderingContext2D = canvas.getContext("2d")!;
+        const drawLoop = async () =>
+            {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                render_donut(canvas, data);
+                requestAnimationFrame(drawLoop);
+            }
+        drawLoop();*/
     });
 }
 main();
