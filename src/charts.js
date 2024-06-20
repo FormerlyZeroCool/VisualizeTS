@@ -86,10 +86,6 @@ function main() {
             return;
         }
         const ctx = maybectx;
-        let start = Date.now();
-        ctx.fillStyle = '#00FFFF';
-        ctx.strokeStyle = '#00FFFF';
-        ctx.lineWidth = canvas.width / 5;
         let data = [
             {
                 "label": "Incomplete",
@@ -108,14 +104,8 @@ function main() {
             }
         ];
         const drawLoop = () => __awaiter(this, void 0, void 0, function* () {
-            const width = canvas.width;
-            const height = canvas.height;
-            //screen.handleEllipse(0, 400, 0, 400);
-            //screen.draw();
             render_donut(canvas, data);
-            const adjustment = Date.now() - start < 30 ? Date.now() - start : 30;
             requestAnimationFrame(drawLoop);
-            start = Date.now();
         });
         drawLoop();
         //while(true){drawLoop(); await sleep(10);}
