@@ -133,14 +133,6 @@ function main() {
             }
         ];
         const canvas = make_donut(document.getElementById('chart'), 500, 500, data);
-        /*const ctx:CanvasRenderingContext2D = canvas.getContext("2d")!;
-        const drawLoop = async () =>
-            {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                render_donut(canvas, data);
-                requestAnimationFrame(drawLoop);
-            }
-        drawLoop();*/
     });
 }
 main();
