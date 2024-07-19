@@ -26,7 +26,7 @@ function setup_text(ctx, width, height) {
     ctx.shadowOffsetY = 2;
     ctx.shadowBlur = 4;
 }
-export function render_donut(canvas, data) {
+function render_donut(canvas, data) {
     let maybectx = canvas.getContext("2d");
     if (!maybectx) {
         console.log("error could not find canvas to render to!!!");
@@ -52,7 +52,7 @@ export function render_donut(canvas, data) {
         start += delta;
     }
 }
-export function make_donut(container, width, height, data) {
+function make_donut(container, width, height, data) {
     container.innerHTML = '';
     // Create the canvas
     const canvas = document.createElement('canvas');

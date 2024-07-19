@@ -27,7 +27,7 @@ async function main()
         "data": [12, 15, 21]
       }
     ];
-    make_donut(div, 150, 150, donut_data);
+    //make_donut(div, 500, 500, donut_data);
     const histogram_data: GroupedRecord[] = [
         {
             label: "CSC101",
@@ -41,8 +41,6 @@ async function main()
             label: "CSC102",
             data: [
                 { label: "Total Class", color: "#FF0000", data: 25 },
-                { label: "Percent Incomplete", color: "#FFFF00", data: 5 },
-                { label: "Passed", color: "#00FF00", data: 20 }
             ]
         },
         {

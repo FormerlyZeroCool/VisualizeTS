@@ -35,7 +35,7 @@ function setup_text(ctx, width, height) {
     ctx.shadowBlur = 4;
 }
 let heightOffset = 20;
-export function render_histogram(canvas, data) {
+function render_histogram(canvas, data) {
     let maybectx = canvas.getContext("2d");
     if (!maybectx) {
         console.log("error could not find canvas to render to!!!");
@@ -83,7 +83,7 @@ function createYAxisLabels(maxValue, height) {
     }
     return yAxisDiv;
 }
-export function make_histogram(container, width, height, data) {
+function make_histogram(container, width, height, data) {
     container.innerHTML = '';
     // Create the canvas
     const canvas = document.createElement('canvas');
@@ -101,6 +101,7 @@ export function make_histogram(container, width, height, data) {
     keyDiv.style.marginLeft = '20px';
     // Populate the key with labels and colors
     const labels = new Set();
+    labels.add('');
     data.forEach(group => {
         group.data.forEach(record => {
             if (labels.has(record.label))
