@@ -42,7 +42,7 @@ export function render_histogram(canvas, data) {
         return;
     }
     const ctx = maybectx;
-    const fontSize = canvas.width / 20;
+    const fontSize = canvas.width / 25;
     heightOffset = fontSize;
     ctx.font = `${fontSize}px Arial`;
     const width = canvas.width;
@@ -55,13 +55,11 @@ export function render_histogram(canvas, data) {
         const normals = normalized[i];
         const groupX = (i + 0.5) * groupSpacing - groupWidth / 2;
         const barWidth = groupWidth / (normalized[0].data.length);
-        console.log(normals.label);
         for (let j = 0; j < normals.data.length; j++) {
             const rec = normals.data[j];
             const barHeight = rec.normal * height;
             const x = groupX + j * barWidth;
             const y = height - barHeight;
-            console.log(rec.label, rec.color, x, y);
             ctx.fillStyle = rec.color;
             ctx.fillRect(x, y, barWidth, barHeight);
             ctx.strokeRect(x, y, barWidth, barHeight);
