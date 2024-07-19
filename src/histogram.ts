@@ -142,6 +142,7 @@ export function make_histogram(container: HTMLDivElement, width: number, height:
 
     // Populate the key with labels and colors
     const labels = new Set<string>();
+    labels.add('');
     data.forEach(group => {
         group.data.forEach(record => {
             if(labels.has(record.label))
