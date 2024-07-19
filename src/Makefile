@@ -1,2 +1,2 @@
 default: charts.ts
-	tsc --strict charts.ts --target es2015
+	tsc --strict charts.ts --target es2020

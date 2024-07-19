@@ -1,4 +1,4 @@
-# donut_chart.js
+# donut.js
 
 ## Summary
 This script provides functionality to create and render a donut chart on an HTML div element. It includes functions to normalize data, set up text styles, render the donut chart, and integrate the chart into a provided container with a key displaying the data labels and colors.
