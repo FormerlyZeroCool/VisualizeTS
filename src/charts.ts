@@ -33,113 +33,113 @@ async function main()
         "data": [{
             "label": "Total Count of the Class",
             "color": "#00FF00",
-            "data": "6906"
+            "data": 69
         }, {
             "label": "Total INC Count per Class",
             "color": "#FF0000",
-            "data": "106"
+            "data": 106
         }]
     }, {
         "label": "SPE 100",
         "data": [{
             "label": "Total Count of the Class",
             "color": "#00FF00",
-            "data": "7427"
+            "data": 74
         }, {
             "label": "Total INC Count per Class",
             "color": "#FF0000",
-            "data": "88"
+            "data": 88
         }]
     }, {
         "label": "CIS 100",
         "data": [{
             "label": "Total Count of the Class",
             "color": "#00FF00",
-            "data": "1241"
+            "data": 41
         }, {
             "label": "Total INC Count per Class",
             "color": "#FF0000",
-            "data": "76"
+            "data": 76
         }]
     }, {
         "label": "ACC 122",
         "data": [{
             "label": "Total Count of the Class",
             "color": "#00FF00",
-            "data": "1665"
+            "data": 65
         }, {
             "label": "Total INC Count per Class",
             "color": "#FF0000",
-            "data": "45"
+            "data": 45
         }]
     }, {
         "label": "ENG 101",
         "data": [{
             "label": "Total Count of the Class",
             "color": "#00FF00",
-            "data": "7619"
+            "data": 76
         }, {
             "label": "Total INC Count per Class",
             "color": "#FF0000",
-            "data": "36"
+            "data": 36
         }]
     }, {
         "label": "CRT 100",
         "data": [{
             "label": "Total Count of the Class",
             "color": "#00FF00",
-            "data": "1379"
+            "data": 13
         }, {
             "label": "Total INC Count per Class",
             "color": "#FF0000",
-            "data": "33"
+            "data": 33
         }]
     }, {
         "label": "BUS 104",
         "data": [{
             "label": "Total Count of the Class",
             "color": "#00FF00",
-            "data": "2183"
+            "data": 21
         }, {
             "label": "Total INC Count per Class",
             "color": "#FF0000",
-            "data": "28"
+            "data": 28
         }]
     }, {
         "label": "SOC 100",
         "data": [{
             "label": "Total Count of the Class",
             "color": "#00FF00",
-            "data": "3020"
+            "data": 32
         }, {
             "label": "Total INC Count per Class",
             "color": "#FF0000",
-            "data": "27"
+            "data": 27
         }]
     }, {
         "label": "MAT 206.5",
         "data": [{
             "label": "Total Count of the Class",
             "color": "#00FF00",
-            "data": "2276"
+            "data": 22
         }, {
             "label": "Total INC Count per Class",
             "color": "#FF0000",
-            "data": "27"
+            "data": 27
         }]
     }, {
         "label": "MAT 150",
         "data": [{
             "label": "Total Count of the Class",
             "color": "#00FF00",
-            "data": "3506"
+            "data": 35
         }, {
             "label": "Total INC Count per Class",
             "color": "#FF0000",
-            "data": "25"
+            "data": 25
         }]
     }]`);
 
-    make_histogram(div, 100, 500, histogram_data);
+    make_histogram(div, 750, 500, histogram_data);
 }
 main();

@@ -23,7 +23,7 @@ interface NormalizedGroupRecord {
 function normalize_records(records:GroupedRecord[]): NormalizedGroupRecord[]
 {
     const normalized:NormalizedGroupRecord[] = [];
-    let max:number = 0;
+    let max:number = -Infinity;
     //Calc max/inital generation of records
     for(let i = 0; i < records.length; i++)
     {
@@ -35,7 +35,7 @@ function normalize_records(records:GroupedRecord[]): NormalizedGroupRecord[]
             const data:DataRecord = record.data[j];
             if (max < data.data)
                 max = data.data;
-            console.log(data)
+            console.log(max, data);
             normal.data.push({...data, normal: 0});
         }
     }
@@ -46,7 +46,7 @@ function normalize_records(records:GroupedRecord[]): NormalizedGroupRecord[]
         for (let j = 0; j < normal.data.length; j++)
         {
             const rec:NormalizedRecord = normal.data[j];
-            console.log(rec);
+            //console.log(rec);
             rec.normal = rec.data / max;
         }
     }
@@ -62,11 +62,10 @@ function setup_text(ctx:CanvasRenderingContext2D, width:number, height:number):v
     ctx.shadowBlur = 4;
 }
 let heightOffset = 20;
-//draw translucent lines across by labels
 //take parameter for 
 //font size, # of y labels/intervals, ymin, ymax,
 //on x labels ensure labels don't interfere with one another
-export function render_histogram(canvas:HTMLCanvasElement, data:GroupedRecord[], fontSize:number):void
+export function render_histogram(canvas:HTMLCanvasElement, data:GroupedRecord[], fontSize:number, y_intervals:number):void
 {
     let maybectx:CanvasRenderingContext2D | null = canvas.getContext("2d");
     if(!maybectx)
@@ -82,9 +81,17 @@ export function render_histogram(canvas:HTMLCanvasElement, data:GroupedRecord[],
     setup_text(ctx, width, height);
     const normalized:NormalizedGroupRecord[] = normalize_records(data);
     const groupSpacing = width / data.length;
-    const groupWidth = groupSpacing / 2;
-    let last_label_end = -1;
+    const groupWidth = groupSpacing / 1.5;
+    const get_max_text_width = (data:GroupedRecord[]) => {
 
+    };
+    let last_label_end = -1;
+    ctx.fillStyle = "rgba(0, 0, 0, 0.25)";
+    for (let i = 0; i < y_intervals; i++)
+    {
+        ctx.fillRect(0, i * width / y_intervals, width, 1);
+    }
+    ctx.strokeStyle = "rgba(255, 255, 255, 0.25)";
     for (let i = 0; i < normalized.length; i++) {
         const normals: NormalizedGroupRecord = normalized[i];
         const groupX = (i + 0.5) * groupSpacing - groupWidth / 2;
@@ -101,7 +108,7 @@ export function render_histogram(canvas:HTMLCanvasElement, data:GroupedRecord[],
             ctx.strokeRect(x, y, barWidth, barHeight);
         }
         // Add group label
-        ctx.fillStyle = "#000";
+        ctx.fillStyle = "rgba(0, 0, 0, 0.75)";
         if (last_label_end < groupX)
         {
             ctx.fillText(normals.label, groupX, canvas.height - 3);
@@ -133,7 +140,7 @@ export interface LabelsConfig {
 };
 
 export function make_histogram(container: HTMLDivElement, width: number, height: number, data: GroupedRecord[], 
-        labels_config:LabelsConfig = {y_precision: -1, y_intervals: 10, fontSize: Math.max(8, width / 30) }): void {
+        labels_config:LabelsConfig = {y_precision: -1, y_intervals: 10, fontSize: Math.max(8, width / 40) }): void {
     container.innerHTML = '';
 
     // Create the canvas
@@ -197,7 +204,8 @@ export function make_histogram(container: HTMLDivElement, width: number, height:
     //container.appendChild(xAxisDiv);
     canvas.width = Math.max(10, width - yAxisDiv.clientWidth - keyDiv.clientWidth);
     canvas.height = height;
+    container.style.border = "thick double";
 
     // Render the histogram
-    render_histogram(canvas, data, labels_config.fontSize);
+    render_histogram(canvas, data, labels_config.fontSize, labels_config.y_intervals);
 }
