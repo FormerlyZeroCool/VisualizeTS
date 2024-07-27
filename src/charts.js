@@ -136,6 +136,6 @@ async function main() {
             "data": 25
         }]
     }]`);
-    make_histogram(div, 750, 500, histogram_data);
+    make_histogram(div, window.innerWidth, window.innerHeight * 0.8, histogram_data);
 }
 main();
