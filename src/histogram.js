@@ -1,25 +1,18 @@
 ;
-function normalize_records(records) {
-    const normalized = [];
-    let max = -Infinity;
-    //Calc max/inital generation of records
-    for (let i = 0; i < records.length; i++) {
-        const record = records[i];
-        const normal = { label: record.label, data: [] };
-        normalized.push(normal);
-        for (let j = 0; j < record.data.length; j++) {
-            const data = record.data[j];
-            if (max < data.data)
-                max = data.data;
-            normal.data.push({ ...data, normal: 0 });
-        }
-    }
+;
+;
+function normalize_records(records, range) {
+    const normalized = records.map((grouped_record) => {
+        return { ...grouped_record,
+            data: grouped_record.data.map((record) => { return { ...record, normal: 0 }; }) };
+    });
     //normalize
     for (let i = 0; i < normalized.length; i++) {
         const normal = normalized[i];
         for (let j = 0; j < normal.data.length; j++) {
             const rec = normal.data[j];
-            rec.normal = rec.data / max;
+            rec.normal = (rec.data - range.y_min) / (range.y_max - range.y_min);
+            rec.normal = rec.data < range.y_min ? 0 : rec.normal;
         }
     }
     return normalized;
@@ -58,11 +51,11 @@ const text_color = "rgba(0, 0, 0, 0.75)";
 //take parameter for 
 //font size, # of y labels/intervals, ymin, ymax,
 //on x labels ensure labels don't interfere with one another
-export function render_histogram(canvas, data, fontSize, y_intervals, percent) {
+export function render_histogram(canvas, data, fontSize, y_intervals, range, percent) {
     let maybectx = canvas.getContext("2d");
     if (!maybectx) {
         console.log("error could not find canvas to render to!!!");
-        return;
+        return false;
     }
     const max_label_char_count = () => {
         let max = -Infinity;
@@ -75,11 +68,9 @@ export function render_histogram(canvas, data, fontSize, y_intervals, percent) {
     const width = canvas.width;
     const height = canvas.height - heightOffset;
     setup_text(ctx, width, height);
-    const normalized = normalize_records(data);
+    const normalized = normalize_records(data, range);
     const groupSpacing = width / data.length;
     const groupWidth = groupSpacing / 1.5;
-    const get_max_text_width = (data) => {
-    };
     let last_label_end = -1;
     ctx.clearRect(0, 0, width, canvas.height);
     //render lines across screen
@@ -98,6 +89,8 @@ export function render_histogram(canvas, data, fontSize, y_intervals, percent) {
             const barHeight = rec.normal * height;
             const x = groupX + j * barWidth;
             const y = height - barHeight;
+            if (!barHeight)
+                continue;
             ctx.fillStyle = rec.color;
             const delta = barHeight * (1 - percent);
             fillRoundedRect(ctx, x, y + delta, barWidth, barHeight - delta, 3);
@@ -112,8 +105,9 @@ export function render_histogram(canvas, data, fontSize, y_intervals, percent) {
         }
     }
     ctx.strokeRect(0, 0, width, height);
+    return true;
 }
-function createYAxisLabels(maxValue, height, precision, intervals, font, fontSize) {
+function createYAxisLabels(range, height, precision, intervals, font, fontSize) {
     const yAxisDiv = document.createElement('div');
     yAxisDiv.style.display = 'flex';
     yAxisDiv.style.flexDirection = 'column';
@@ -125,34 +119,40 @@ function createYAxisLabels(maxValue, height, precision, intervals, font, fontSiz
     yAxisDiv.style.color = text_color;
     for (let i = intervals; i >= 0; i--) {
         const label = document.createElement('div');
-        label.innerText = ((maxValue / intervals) * i).toFixed(precision);
+        label.innerText = (range.y_min + ((range.y_max - range.y_min) / intervals * i)).toFixed(precision);
         yAxisDiv.appendChild(label);
     }
     return yAxisDiv;
 }
-;
-export function make_histogram(container, width, height, data, labels_config = { y_precision: -1, y_intervals: 10, fontSize: Math.max(8, width / 80) }, auto_resize = true) {
+export function make_histogram(container, width, height, data, auto_resize = true, labels_config = { y_precision: -1, y_intervals: 10, fontSize: -1 }, range = { y_min: Infinity, y_max: Infinity }) {
     const window_width = window.innerWidth;
     const window_height = window.innerHeight;
+    const ratio_w = () => window.innerWidth / window_width;
+    const ratio_h = () => window.innerHeight / window_height;
+    const maxDataValue = Math.max(...data.flatMap(group => group.data.map(record => record.data)));
     const original_width = width;
     const original_height = height;
+    const original_fontSize = labels_config.fontSize < 0 ? Math.max(8, width / 80) : labels_config.fontSize;
     let first_render = true;
+    if (Math.abs(range.y_min) === Infinity)
+        range.y_min = 0;
+    if (Math.abs(range.y_max) === Infinity)
+        range.y_max = maxDataValue;
+    if (range.y_min > range.y_max)
+        return false;
+    if (labels_config.y_precision < 0)
+        labels_config.y_precision = Math.max(0, 2 - Math.floor(Math.log10(range.y_max - range.y_min)));
     const render = () => {
-        const ratio_w = () => window.innerWidth / window_width;
-        const ratio_h = () => window.innerHeight / window_height;
         container.innerHTML = '';
         width = original_width * ratio_w();
         height = original_height * ratio_h();
-        labels_config.fontSize = Math.max(8, width / 40);
+        labels_config.fontSize = original_fontSize * ratio_w();
         // Create the canvas
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext("2d");
         ctx.font = `${labels_config.fontSize}px Arial`;
         // Create the y-axis labels
-        const maxDataValue = Math.max(...data.flatMap(group => group.data.map(record => record.data)));
-        if (labels_config.y_precision < 0)
-            labels_config.y_precision = Math.max(0, 2 - Math.floor(Math.log10(maxDataValue)));
-        const yAxisDiv = createYAxisLabels(maxDataValue, height, labels_config.y_precision, labels_config.y_intervals, ctx.font, labels_config.fontSize);
+        const yAxisDiv = createYAxisLabels(range, height, labels_config.y_precision, labels_config.y_intervals, ctx.font, labels_config.fontSize);
         // Create the key div
         const keyDiv = document.createElement('div');
         keyDiv.style.display = 'flex';
@@ -203,8 +203,8 @@ export function make_histogram(container, width, height, data, labels_config = {
         //container.appendChild(xAxisDiv);
         canvas.width = Math.max(10, width - yAxisDiv.clientWidth - keyDiv.clientWidth);
         canvas.height = height;
-        containerDiv.style.border = "thick ridge rgba(0, 0, 0, 0.25)";
-        const draw = (percent) => render_histogram(canvas, data, labels_config.fontSize, labels_config.y_intervals, percent);
+        //containerDiv.style.border = "thick ridge rgba(0, 0, 0, 0.25)";
+        const draw = (percent) => render_histogram(canvas, data, labels_config.fontSize, labels_config.y_intervals, range, percent);
         // Render the histogram
         if (first_render) {
             first_render = false;
@@ -219,11 +219,11 @@ export function make_histogram(container, width, height, data, labels_config = {
                 }
                 draw(percent);
             }, frame_time);
-            return;
+            return true;
         }
-        draw(1);
+        return draw(1);
     };
-    window.addEventListener("load", render);
     if (auto_resize)
         window.addEventListener('resize', render);
+    return render();
 }
