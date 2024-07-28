@@ -101,6 +101,10 @@ function render_text_at_angle(ctx: CanvasRenderingContext2D, text: string, x: nu
     ctx.restore();
   }
 const text_color = "rgba(0, 0, 0, 0.75)";
+interface RenderStruct {
+    color:string;
+    render_fun:() => void;
+};
 //take parameter for 
 //font size, # of y labels/intervals, ymin, ymax,
 //on x labels ensure labels don't interfere with one another
@@ -133,6 +137,7 @@ export function render_histogram(canvas:HTMLCanvasElement, data:GroupedRecord[],
     }
     //render bars, and labels
     ctx.strokeStyle = "rgba(255, 255, 255, 0.25)";
+    const render_data:RenderStruct[] = [];
     for (let i = 0; i < normalized.length; i++) {
         const normals: NormalizedGroupRecord = normalized[i];
         const groupX = (i + 0.5) * groupSpacing - groupWidth / 2;
@@ -145,28 +150,45 @@ export function render_histogram(canvas:HTMLCanvasElement, data:GroupedRecord[],
             const y = height - barHeight;
             if (!barHeight)
                 continue;
-            ctx.fillStyle = rec.color;
             if (percent < 1)
             {
-                ctx.fillRect(x, y, barWidth, barHeight);
-                ctx.strokeRect(x, y, barWidth, barHeight);
+                render_data.push({color: rec.color, render_fun: () => {
+                    ctx.fillRect(x, y, barWidth, barHeight);
+                    ctx.strokeRect(x, y, barWidth, barHeight);
+                }});
             }
             else
             {
-                fillRoundedRect(ctx, x, y, barWidth, barHeight, 3);
-                strokeRoundedRect(ctx, x, y, barWidth, barHeight, 3);
+                render_data.push({color: rec.color, render_fun: () => {
+                    ctx.fillRect(x, y, barWidth, barHeight);
+                    ctx.strokeRect(x, y, barWidth, barHeight);
+                }});
             }
         }
         // Add group label
         if (last_label_end < groupX)
         {
-            ctx.fillStyle = text_color;
             //ctx.fillText(normals.label, groupX, canvas.height - 3);
             //ctx.strokeText(normals.label, groupX, canvas.height - 3);
-            render_text_at_angle(ctx, normals.label, groupX + groupWidth / 2 - fontSize / 2, canvas.height - heightOffset + fontSize / 2, 90);
+                render_data.push({color: text_color, render_fun: () => {
+                    render_text_at_angle(ctx, normals.label, groupX + groupWidth / 2 - fontSize / 2, canvas.height - heightOffset + fontSize / 2, 90);
+                }});
+            
             //last_label_end = groupX + ctx.measureText(normals.label).width + 3;
         }
     }
+    let current_color = ""
+    render_data.sort((a, b) => {
+        return a.color < b.color ? -1 : (b.color < a.color ? 1 : 0);
+    })
+    render_data.forEach((rec) => {
+        if (current_color != rec.color)
+        {
+            current_color = rec.color;
+            ctx.fillStyle = rec.color;
+        }
+        rec.render_fun();
+    });
     ctx.strokeRect(0, 0, width, height);
     return true;
 }
@@ -308,7 +330,7 @@ export function make_histogram(container: HTMLDivElement, width: number, height:
         if (first_render)
         {
             first_render = false;
-            const total_time = 300;
+            const total_time = 3000;
             const start_time = Date.now();
             const frame_time = 12;
             const intervalId = setInterval(() => {
