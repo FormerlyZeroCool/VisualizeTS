@@ -139,7 +139,8 @@ async function main()
             "data": 25
         }]
     }]`);
-
+    for(let i = 0; i < 100; i++)
+        histogram_data.push(histogram_data[i]);
     const histogram_data1 = 
         [{"label":"","data":[{"label":"Correct answers over time","color":"#000080","data":100}]},{"label":"","data":[{"label":"Correct answers over time","color":"#000080","data":100}]},{"label":"","data":[{"label":"Correct answers over time","color":"#000080","data":100}]},{"label":"","data":[{"label":"Correct answers over time","color":"#000080","data":100}]},{"label":"","data":[{"label":"Correct answers over time","color":"#000080","data":100}]},{"label":"","data":[{"label":"Correct answers over time","color":"#000080","data":100}]},{"label":"","data":[{"label":"Correct answers over time","color":"#000080","data":100}]},{"label":"","data":[{"label":"Correct answers over time","color":"#000080","data":100}]}];
 

@@ -332,7 +332,7 @@ export function make_histogram(container: HTMLDivElement, width: number, height:
             first_render = false;
             const total_time = 300;
             const start_time = Date.now();
-            const frame_time = 12;
+            const frame_time = 30;
             const intervalId = setInterval(() => {
                 let percent = (Date.now() - start_time) / total_time;
                 if (percent >= 1)
