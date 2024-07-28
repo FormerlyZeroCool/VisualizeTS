@@ -144,8 +144,8 @@ async function main()
         [{"label":"","data":[{"label":"Correct answers over time","color":"#000080","data":100}]},{"label":"","data":[{"label":"Correct answers over time","color":"#000080","data":100}]},{"label":"","data":[{"label":"Correct answers over time","color":"#000080","data":100}]},{"label":"","data":[{"label":"Correct answers over time","color":"#000080","data":100}]},{"label":"","data":[{"label":"Correct answers over time","color":"#000080","data":100}]},{"label":"","data":[{"label":"Correct answers over time","color":"#000080","data":100}]},{"label":"","data":[{"label":"Correct answers over time","color":"#000080","data":100}]},{"label":"","data":[{"label":"Correct answers over time","color":"#000080","data":100}]}];
 
 
-    make_histogram(div, window.innerWidth, window.innerHeight * 0.8, histogram_data, true, 
-        { y_precision: -1, y_intervals: 10, fontSize: 18 }, 
+    make_histogram(div, window.innerWidth, window.innerHeight * 0.95, histogram_data, true, 
+        { y_precision: -1, y_intervals: 10, fontSize: -1 }, 
         {y_min: 0, y_max: 100});
 }
 main();
