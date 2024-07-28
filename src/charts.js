@@ -129,11 +129,11 @@ async function main() {
         "data": [{
             "label": "Total Count of the Class",
             "color": "#00FF00",
-            "data": -35
+            "data": 35
         }, {
             "label": "Total INC Count per Class",
             "color": "#FF0000",
-            "data": -25
+            "data": 25
         }]
     }]`);
     const histogram_data1 = [{ "label": "", "data": [{ "label": "Correct answers over time", "color": "#000080", "data": 100 }] }, { "label": "", "data": [{ "label": "Correct answers over time", "color": "#000080", "data": 100 }] }, { "label": "", "data": [{ "label": "Correct answers over time", "color": "#000080", "data": 100 }] }, { "label": "", "data": [{ "label": "Correct answers over time", "color": "#000080", "data": 100 }] }, { "label": "", "data": [{ "label": "Correct answers over time", "color": "#000080", "data": 100 }] }, { "label": "", "data": [{ "label": "Correct answers over time", "color": "#000080", "data": 100 }] }, { "label": "", "data": [{ "label": "Correct answers over time", "color": "#000080", "data": 100 }] }, { "label": "", "data": [{ "label": "Correct answers over time", "color": "#000080", "data": 100 }] }];

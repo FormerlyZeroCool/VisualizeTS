@@ -44,8 +44,8 @@ function normalize_records(records:GroupedRecord[], range:RangeConfig): Normaliz
         for (let j = 0; j < normal.data.length; j++)
         {
             const rec:NormalizedRecord = normal.data[j];
-            rec.normal = (rec.data - range.y_min) / (range.y_max - range.y_min);
-            rec.normal = rec.data < range.y_min ? 0 : rec.normal;
+            if (rec.data > range.y_min)
+                rec.normal = (rec.data - range.y_min) / (range.y_max - range.y_min);
         }
     }
     return normalized;
@@ -135,15 +135,22 @@ export function render_histogram(canvas:HTMLCanvasElement, data:GroupedRecord[],
 
         for (let j = 0; j < normals.data.length; j++) {
             const rec: NormalizedRecord = normals.data[j];
-            const barHeight = rec.normal * height;
+            const barHeight = rec.normal * height * percent;
             const x = groupX + j * barWidth;
             const y = height - barHeight;
             if (!barHeight)
                 continue;
             ctx.fillStyle = rec.color;
-            const delta = barHeight * (1 - percent);
-            fillRoundedRect(ctx, x, y + delta, barWidth, barHeight - delta, 3);
-            strokeRoundedRect(ctx, x, y + delta, barWidth, barHeight - delta, 3);
+            if (percent < 1)
+            {
+                ctx.fillRect(x, y, barWidth, barHeight);
+                ctx.strokeRect(x, y, barWidth, barHeight);
+            }
+            else
+            {
+                fillRoundedRect(ctx, x, y, barWidth, barHeight, 3);
+                strokeRoundedRect(ctx, x, y, barWidth, barHeight, 3);
+            }
         }
         // Add group label
         if (last_label_end < groupX)
