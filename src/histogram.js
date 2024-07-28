@@ -240,7 +240,7 @@ export function make_histogram(container, width, height, data, auto_resize = tru
         // Render the histogram
         if (first_render) {
             first_render = false;
-            const total_time = 3000;
+            const total_time = 300;
             const start_time = Date.now();
             const frame_time = 12;
             const intervalId = setInterval(() => {
