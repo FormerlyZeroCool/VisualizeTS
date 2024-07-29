@@ -108,7 +108,7 @@ interface RenderStruct {
 //take parameter for 
 //font size, # of y labels/intervals, ymin, ymax,
 //on x labels ensure labels don't interfere with one another
-export function render_histogram(canvas:HTMLCanvasElement, data:GroupedRecord[], fontSize:number, y_intervals:number, range:RangeConfig, heightOffset:number, percent:number):boolean
+export function render_histogram(canvas:HTMLCanvasElement, data:GroupedRecord[], fontSize:number, y_intervals:number, range:RangeConfig, heightOffset:number, percent:number, render_text:boolean, last_percent:number = -1):boolean
 {
     let maybectx:CanvasRenderingContext2D | null = canvas.getContext("2d");
     if(!maybectx)
@@ -125,15 +125,25 @@ export function render_histogram(canvas:HTMLCanvasElement, data:GroupedRecord[],
     const normalized:NormalizedGroupRecord[] = normalize_records(data, range);
     const groupSpacing = width / data.length;
     const groupWidth = groupSpacing / 1.5;
-
+    const last_percent_is_invalid = last_percent > percent || last_percent < 0 || last_percent > 1;
     let last_label_end = -1;
-    ctx.clearRect(0, 0, width, canvas.height);
-
-    //render lines across screen
-    ctx.fillStyle = "rgba(0, 0, 0, 0.25)";
-    for (let i = 1; i < y_intervals; i++)
+    if (last_percent_is_invalid)
     {
-        ctx.fillRect(0, i * height / y_intervals, width, 1);
+        console.log("jhi")
+        if (render_text)
+            ctx.clearRect(0, 0, width, canvas.height);
+        else
+            ctx.clearRect(0, 0, width, height - heightOffset);
+    }
+    ctx.imageSmoothingEnabled = false;
+    if (last_percent_is_invalid)
+    {
+        //render lines across screen
+        ctx.fillStyle = "rgba(0, 0, 0, 0.25)";
+        for (let i = 1; i < y_intervals; i++)
+        {
+            ctx.fillRect(0, i * height / y_intervals, width, 1);
+        }
     }
     //render bars, and labels
     ctx.strokeStyle = "rgba(255, 255, 255, 0.25)";
@@ -148,14 +158,21 @@ export function render_histogram(canvas:HTMLCanvasElement, data:GroupedRecord[],
             const barHeight = rec.normal * height * percent;
             const x = groupX + j * barWidth;
             const y = height - barHeight;
-            if (!barHeight)
+            if (barHeight < 0)
                 continue;
             if (percent < 1)
             {
-                render_data.push({color: rec.color, render_fun: () => {
-                    ctx.fillRect(x, y, barWidth, barHeight);
-                    ctx.strokeRect(x, y, barWidth, barHeight);
-                }});
+                if (last_percent_is_invalid)
+                    render_data.push({color: rec.color, render_fun: () => {
+                        ctx.fillRect(x, y, barWidth, barHeight);
+                        ctx.strokeRect(x, y, barWidth, barHeight);
+                    }});
+                else
+                    render_data.push({color: rec.color, render_fun: () => {
+                        const altered_height = Math.max(1, (percent - last_percent)) * barHeight;
+                        ctx.fillRect(x, y, barWidth, altered_height);
+                        ctx.strokeRect(x, y, barWidth, altered_height);
+                    }});
             }
             else
             {
@@ -166,7 +183,7 @@ export function render_histogram(canvas:HTMLCanvasElement, data:GroupedRecord[],
             }
         }
         // Add group label
-        if (last_label_end < groupX)
+        if (render_text)
         {
             //ctx.fillText(normals.label, groupX, canvas.height - 3);
             //ctx.strokeText(normals.label, groupX, canvas.height - 3);
@@ -254,6 +271,7 @@ export function make_histogram(container: HTMLDivElement, width: number, height:
         container.innerHTML = '';
         width = original_width * ratio_w();
         height = original_height * ratio_h();
+        console.log(ratio_w(), ratio_h());
         labels_config.fontSize = Math.max(8, original_fontSize * ratio_w());
 
         ctx.font = `${labels_config.fontSize}px Arial`;
@@ -318,33 +336,50 @@ export function make_histogram(container: HTMLDivElement, width: number, height:
 
         // Append the container div to the provided div
         container.appendChild(containerDiv);
-        keyDiv.style.width = `${window.innerWidth * color_box_width / 100 + max_text_width + color_box_margin_right}px`;
-        //container.appendChild(xAxisDiv);
-        canvas.width = Math.max(10, width - yAxisDiv.clientWidth - keyDiv.clientWidth);
+        const keyDivCalcedWidth = window.innerWidth * color_box_width / 100 + max_text_width + color_box_margin_right;
+        keyDiv.style.width = `${keyDivCalcedWidth}px`;
+        
+        canvas.width = Math.max(10, width - yAxisDiv.clientWidth - keyDivCalcedWidth);
         canvas.height = height;
+        /*
+        console.log(
+            keyDiv.style.width, "\ncalc canvas:", 
+            width - yAxisDiv.clientWidth - keyDiv.clientWidth, 
+            "\nraw:", width, 
+            "\nyadiv:", yAxisDiv.clientWidth,
+            "\nkeydiv:", keyDiv.clientWidth, 
+            "\ncanvas:", canvas.width
+        );*/
+        
         //containerDiv.style.border = "thick ridge rgba(0, 0, 0, 0.25)";
 
-        const draw = (percent:number):boolean => 
-            render_histogram(canvas, data, labels_config.fontSize, labels_config.y_intervals, range, heightOffset, percent);
-        // Render the histogram
+        const draw = (percent:number, render_text:boolean, last_percent:number = -1):boolean => 
+            render_histogram(canvas, data, labels_config.fontSize, labels_config.y_intervals, range, heightOffset, percent, render_text, last_percent);
+
         if (first_render)
         {
             first_render = false;
             const total_time = 300;
             const start_time = Date.now();
-            const frame_time = 30;
+            const frame_time = 10;
+
+            let last_percent = 0;
+            draw(last_percent, true);
             const intervalId = setInterval(() => {
                 let percent = (Date.now() - start_time) / total_time;
                 if (percent >= 1)
                 {
                     percent = 1;
                     clearInterval(intervalId);
+                    draw(percent, true);
+                    return true;
                 }
-                draw(percent);
+                draw(percent, false, last_percent);
+                last_percent = percent;
             }, frame_time);
             return true;
         }
-        return draw(1);
+        return draw(1, true);
     };
     if (auto_resize)
         window.addEventListener('resize', render);
