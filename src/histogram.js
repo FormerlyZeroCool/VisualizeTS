@@ -74,16 +74,15 @@ export function render_histogram(canvas, data, fontSize, y_intervals, range, hei
     const normalized = normalize_records(data, range);
     const groupSpacing = width / data.length;
     const groupWidth = groupSpacing / 1.5;
-    const last_percent_is_invalid = last_percent > percent || last_percent < 0 || last_percent > 1;
+    const last_percent_is_invalid = percent >= 1 || last_percent > percent || last_percent < 0 || last_percent > 1;
     let last_label_end = -1;
     if (last_percent_is_invalid) {
-        console.log("jhi");
         if (render_text)
             ctx.clearRect(0, 0, width, canvas.height);
         else
             ctx.clearRect(0, 0, width, height - heightOffset);
     }
-    ctx.imageSmoothingEnabled = false;
+    //ctx.imageSmoothingEnabled = false;
     if (last_percent_is_invalid) {
         //render lines across screen
         ctx.fillStyle = "rgba(0, 0, 0, 0.25)";
@@ -100,7 +99,8 @@ export function render_histogram(canvas, data, fontSize, y_intervals, range, hei
         const barWidth = groupWidth / (normalized[0].data.length);
         for (let j = 0; j < normals.data.length; j++) {
             const rec = normals.data[j];
-            const barHeight = rec.normal * height * percent;
+            const o_barHeight = rec.normal * height;
+            const barHeight = o_barHeight * percent;
             const x = groupX + j * barWidth;
             const y = height - barHeight;
             if (barHeight < 0)
@@ -113,15 +113,17 @@ export function render_histogram(canvas, data, fontSize, y_intervals, range, hei
                         } });
                 else
                     render_data.push({ color: rec.color, render_fun: () => {
-                            const altered_height = Math.max(1, (percent - last_percent)) * barHeight;
+                            const altered_height = (percent - last_percent) * o_barHeight;
+                            //const yi = y//Math.ceil(y);
                             ctx.fillRect(x, y, barWidth, altered_height);
-                            ctx.strokeRect(x, y, barWidth, altered_height);
+                            //ctx.strokeRect(x, yi, barWidth, altered_height);
+                            //console.log(percent - last_percent, y, altered_height);
                         } });
             }
             else {
                 render_data.push({ color: rec.color, render_fun: () => {
-                        ctx.fillRect(x, y, barWidth, barHeight);
-                        ctx.strokeRect(x, y, barWidth, barHeight);
+                        fillRoundedRect(ctx, x, y, barWidth, barHeight, 3);
+                        strokeRoundedRect(ctx, x, y, barWidth, barHeight, 3);
                     } });
             }
         }
@@ -139,6 +141,7 @@ export function render_histogram(canvas, data, fontSize, y_intervals, range, hei
     render_data.sort((a, b) => {
         return a.color < b.color ? -1 : (b.color < a.color ? 1 : 0);
     });
+    ctx.imageSmoothingEnabled = false;
     render_data.forEach((rec) => {
         if (current_color != rec.color) {
             current_color = rec.color;
@@ -197,7 +200,6 @@ export function make_histogram(container, width, height, data, auto_resize = tru
         container.innerHTML = '';
         width = original_width * ratio_w();
         height = original_height * ratio_h();
-        console.log(ratio_w(), ratio_h());
         labels_config.fontSize = Math.max(8, original_fontSize * ratio_w());
         ctx.font = `${labels_config.fontSize}px Arial`;
         // Create the y-axis labels
@@ -268,8 +270,9 @@ export function make_histogram(container, width, height, data, auto_resize = tru
             first_render = false;
             const total_time = 300;
             const start_time = Date.now();
-            const frame_time = 10;
+            const frame_time = 8;
             let last_percent = 0;
+            let last_whole_percent = 0;
             draw(last_percent, true);
             const intervalId = setInterval(() => {
                 let percent = (Date.now() - start_time) / total_time;
@@ -280,6 +283,13 @@ export function make_histogram(container, width, height, data, auto_resize = tru
                     return true;
                 }
                 draw(percent, false, last_percent);
+                //console.log(percent, last_percent)
+                /*if (Math.floor(last_percent * 100) > Math.floor(last_whole_percent * 100))
+                {
+                    //console.log(Math.ceil(percent * 100) / 100, false, last_whole_percent);
+                    draw(Math.ceil(percent * 100) / 100, false, last_whole_percent);
+                    last_whole_percent = Math.floor(last_percent * 100) / 100;
+                }*/
                 last_percent = percent;
             }, frame_time);
             return true;
