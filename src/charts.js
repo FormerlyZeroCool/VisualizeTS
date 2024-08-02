@@ -30,7 +30,7 @@ async function main() {
         "data": [{
             "label": "Total Count of the Class",
             "color": "rgba(0,0,0,0.25)",
-            "data": 69
+            "data": 49
         }, {
             "label": "Total INC Count per Class",
             "color": "#FF0000",
@@ -138,8 +138,8 @@ async function main() {
     }]`);
     for (let i = 0; i < 10; i++)
         histogram_data.push(histogram_data[i]);
-    histogram_data.splice(0, 19);
+    histogram_data.splice(2, 19);
     const histogram_data1 = [{ "label": "", "data": [{ "label": "Correct answers over time", "color": "#000080", "data": 100 }] }, { "label": "", "data": [{ "label": "Correct answers over time", "color": "#000080", "data": 100 }] }, { "label": "", "data": [{ "label": "Correct answers over time", "color": "#000080", "data": 100 }] }, { "label": "", "data": [{ "label": "Correct answers over time", "color": "#000080", "data": 100 }] }, { "label": "", "data": [{ "label": "Correct answers over time", "color": "#000080", "data": 100 }] }, { "label": "", "data": [{ "label": "Correct answers over time", "color": "#000080", "data": 100 }] }, { "label": "", "data": [{ "label": "Correct answers over time", "color": "#000080", "data": 100 }] }, { "label": "", "data": [{ "label": "Correct answers over time", "color": "#000080", "data": 100 }] }];
-    make_histogram(div, window.innerWidth, window.innerHeight * 0.95, histogram_data, true, { y_precision: -1, y_intervals: 10, fontSize: -1 }, { y_min: 0, y_max: 35 });
+    make_histogram(div, window.innerWidth, window.innerHeight * 0.95, histogram_data, true, { y_precision: -1, y_intervals: 11, fontSize: -1 }, { y_min: 0, y_max: 110 });
 }
 main();

@@ -173,21 +173,19 @@ export function render_histogram(canvas:HTMLCanvasElement, data:GroupedRecord[],
             else
             {
                 render_data.push({color: rec.color, render_fun: () => {
-                    fillRoundedRect(ctx, x, y, barWidth, barHeight, 3);
-                    strokeRoundedRect(ctx, x, y, barWidth, barHeight, 3);
+                    fillRoundedRect(ctx, x, y, barWidth, barHeight, barWidth / 16);
+                    strokeRoundedRect(ctx, x, y, barWidth, barHeight, barWidth / 16);
                 }});
             }
         }
         // Add group label
-        if (render_text)
+        const text_x = groupX + groupWidth / 2 - fontSize / 2;
+        if (render_text && text_x > last_label_end)
         {
-            //ctx.fillText(normals.label, groupX, canvas.height - 3);
-            //ctx.strokeText(normals.label, groupX, canvas.height - 3);
-                render_data.push({color: text_color, render_fun: () => {
-                    render_text_at_angle(ctx, normals.label, groupX + groupWidth / 2 - fontSize / 2, canvas.height - heightOffset - fontSize / 3, 90);
-                }});
-            
-            //last_label_end = groupX + ctx.measureText(normals.label).width + 3;
+            render_data.push({color: text_color, render_fun: () => {
+                render_text_at_angle(ctx, normals.label, text_x, canvas.height - heightOffset, 90);
+            }});
+            last_label_end = text_x + fontSize + 3;
         }
     }
     let current_color = ""

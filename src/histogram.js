@@ -116,19 +116,18 @@ export function render_histogram(canvas, data, fontSize, y_intervals, range, hei
             }
             else {
                 render_data.push({ color: rec.color, render_fun: () => {
-                        fillRoundedRect(ctx, x, y, barWidth, barHeight, 3);
-                        strokeRoundedRect(ctx, x, y, barWidth, barHeight, 3);
+                        fillRoundedRect(ctx, x, y, barWidth, barHeight, barWidth / 16);
+                        strokeRoundedRect(ctx, x, y, barWidth, barHeight, barWidth / 16);
                     } });
             }
         }
         // Add group label
-        if (render_text) {
-            //ctx.fillText(normals.label, groupX, canvas.height - 3);
-            //ctx.strokeText(normals.label, groupX, canvas.height - 3);
+        const text_x = groupX + groupWidth / 2 - fontSize / 2;
+        if (render_text && text_x > last_label_end) {
             render_data.push({ color: text_color, render_fun: () => {
-                    render_text_at_angle(ctx, normals.label, groupX + groupWidth / 2 - fontSize / 2, canvas.height - heightOffset - fontSize / 3, 90);
+                    render_text_at_angle(ctx, normals.label, text_x, canvas.height - heightOffset, 90);
                 } });
-            //last_label_end = groupX + ctx.measureText(normals.label).width + 3;
+            last_label_end = text_x + fontSize + 3;
         }
     }
     let current_color = "";
