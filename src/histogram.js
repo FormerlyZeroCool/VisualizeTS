@@ -126,7 +126,7 @@ export function render_histogram(canvas, data, fontSize, y_intervals, range, hei
             //ctx.fillText(normals.label, groupX, canvas.height - 3);
             //ctx.strokeText(normals.label, groupX, canvas.height - 3);
             render_data.push({ color: text_color, render_fun: () => {
-                    render_text_at_angle(ctx, normals.label, groupX + groupWidth / 2 - fontSize / 2, canvas.height - heightOffset + fontSize / 2, 90);
+                    render_text_at_angle(ctx, normals.label, groupX + groupWidth / 2 - fontSize / 2, canvas.height - heightOffset - fontSize / 3, 90);
                 } });
             //last_label_end = groupX + ctx.measureText(normals.label).width + 3;
         }
@@ -182,20 +182,20 @@ export function make_histogram(container, width, height, data, auto_resize = tru
         return false;
     if (labels_config.y_precision < 0)
         labels_config.y_precision = Math.max(0, 2 - Math.floor(Math.log10(range.y_max - range.y_min)));
-    const max_label_char_count = () => {
-        let max = -Infinity;
-        data.forEach((cur) => max = max < cur.label.length ? cur.label.length : max);
-        return max;
-    };
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext("2d");
+    const max_label_char_count = () => {
+        let max = -Infinity;
+        data.forEach((cur) => max = max < ctx.measureText(cur.label).width ? ctx.measureText(cur.label).width : max);
+        return max;
+    };
     const render = () => {
-        const heightOffset = max_label_char_count() * labels_config.fontSize;
         container.innerHTML = '';
         width = original_width * ratio_w();
         height = original_height * ratio_h();
         labels_config.fontSize = Math.max(8, original_fontSize * ratio_w());
         ctx.font = `${labels_config.fontSize}px Arial`;
+        const heightOffset = max_label_char_count() + labels_config.fontSize / 3;
         // Create the y-axis labels
         const yAxisDiv = createYAxisLabels(range, height, labels_config.y_precision, labels_config.y_intervals, ctx.font, labels_config.fontSize, heightOffset);
         // Create the key div
