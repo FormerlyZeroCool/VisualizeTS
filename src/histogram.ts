@@ -160,21 +160,15 @@ export function render_histogram(canvas:HTMLCanvasElement, data:GroupedRecord[],
             const y = height - barHeight;
             if (barHeight < 0)
                 continue;
-            if (percent < 1)
+            if (percent < 1 && !last_percent_is_invalid)
             {
-                if (last_percent_is_invalid)
-                    render_data.push({color: rec.color, render_fun: () => {
-                        ctx.fillRect(x, y, barWidth, barHeight);
-                        ctx.strokeRect(x, y, barWidth, barHeight);
-                    }});
-                else
-                    render_data.push({color: rec.color, render_fun: () => {
-                        const altered_height = (percent - last_percent) * o_barHeight;
-                        //const yi = y//Math.ceil(y);
-                        ctx.fillRect(x, y, barWidth, altered_height);
-                        //ctx.strokeRect(x, yi, barWidth, altered_height);
-                        //console.log(percent - last_percent, y, altered_height);
-                    }});
+                render_data.push({color: rec.color, render_fun: () => {
+                    const altered_height = (percent - last_percent) * o_barHeight;
+                    //const yi = y//Math.ceil(y);
+                    ctx.fillRect(x, y, barWidth, altered_height);
+                    //ctx.strokeRect(x, yi, barWidth, altered_height);
+                    //console.log(percent - last_percent, y, altered_height);
+                }});
             }
             else
             {
@@ -343,17 +337,6 @@ export function make_histogram(container: HTMLDivElement, width: number, height:
         
         canvas.width = Math.max(10, width - yAxisDiv.clientWidth - keyDivCalcedWidth);
         canvas.height = height;
-        /*
-        console.log(
-            keyDiv.style.width, "\ncalc canvas:", 
-            width - yAxisDiv.clientWidth - keyDiv.clientWidth, 
-            "\nraw:", width, 
-            "\nyadiv:", yAxisDiv.clientWidth,
-            "\nkeydiv:", keyDiv.clientWidth, 
-            "\ncanvas:", canvas.width
-        );*/
-        
-        //containerDiv.style.border = "thick ridge rgba(0, 0, 0, 0.25)";
 
         const draw = (percent:number, render_text:boolean, last_percent:number = -1):boolean => 
             render_histogram(canvas, data, labels_config.fontSize, labels_config.y_intervals, range, heightOffset, percent, render_text, last_percent);
@@ -368,28 +351,22 @@ export function make_histogram(container: HTMLDivElement, width: number, height:
             let last_percent = 0;
             let last_whole_percent = 0;
             draw(last_percent, true);
-            const intervalId = setInterval(() => {
+            const animate = () => {
                 let percent = (Date.now() - start_time) / total_time;
                 if (percent >= 1)
                 {
                     percent = 1;
-                    clearInterval(intervalId);
                     draw(percent, true);
-                    return true;
+                    return;
                 }
                 draw(percent, false, last_percent);
-                //console.log(percent, last_percent)
-                /*if (Math.floor(last_percent * 100) > Math.floor(last_whole_percent * 100))
-                {
-                    //console.log(Math.ceil(percent * 100) / 100, false, last_whole_percent);
-                    draw(Math.ceil(percent * 100) / 100, false, last_whole_percent);
-                    last_whole_percent = Math.floor(last_percent * 100) / 100;
-                }*/
                 last_percent = percent;
-            }, frame_time);
+                requestAnimationFrame(animate);
+            } 
+            requestAnimationFrame(animate);
             return true;
         }
-        return draw(1, true);
+        return draw(1, false);
     };
     if (auto_resize)
         window.addEventListener('resize', render);

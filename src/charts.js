@@ -136,9 +136,10 @@ async function main() {
             "data": 25
         }]
     }]`);
-    for (let i = 0; i < 1; i++)
+    for (let i = 0; i < 10; i++)
         histogram_data.push(histogram_data[i]);
+    histogram_data.splice(0, 19);
     const histogram_data1 = [{ "label": "", "data": [{ "label": "Correct answers over time", "color": "#000080", "data": 100 }] }, { "label": "", "data": [{ "label": "Correct answers over time", "color": "#000080", "data": 100 }] }, { "label": "", "data": [{ "label": "Correct answers over time", "color": "#000080", "data": 100 }] }, { "label": "", "data": [{ "label": "Correct answers over time", "color": "#000080", "data": 100 }] }, { "label": "", "data": [{ "label": "Correct answers over time", "color": "#000080", "data": 100 }] }, { "label": "", "data": [{ "label": "Correct answers over time", "color": "#000080", "data": 100 }] }, { "label": "", "data": [{ "label": "Correct answers over time", "color": "#000080", "data": 100 }] }, { "label": "", "data": [{ "label": "Correct answers over time", "color": "#000080", "data": 100 }] }];
-    make_histogram(div, window.innerWidth, window.innerHeight * 0.95, histogram_data, true, { y_precision: -1, y_intervals: 10, fontSize: -1 }, { y_min: 0, y_max: 100 });
+    make_histogram(div, window.innerWidth, window.innerHeight * 0.95, histogram_data, true, { y_precision: -1, y_intervals: 10, fontSize: -1 }, { y_min: 0, y_max: 35 });
 }
 main();

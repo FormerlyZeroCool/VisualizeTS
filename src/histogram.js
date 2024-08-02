@@ -105,20 +105,14 @@ export function render_histogram(canvas, data, fontSize, y_intervals, range, hei
             const y = height - barHeight;
             if (barHeight < 0)
                 continue;
-            if (percent < 1) {
-                if (last_percent_is_invalid)
-                    render_data.push({ color: rec.color, render_fun: () => {
-                            ctx.fillRect(x, y, barWidth, barHeight);
-                            ctx.strokeRect(x, y, barWidth, barHeight);
-                        } });
-                else
-                    render_data.push({ color: rec.color, render_fun: () => {
-                            const altered_height = (percent - last_percent) * o_barHeight;
-                            //const yi = y//Math.ceil(y);
-                            ctx.fillRect(x, y, barWidth, altered_height);
-                            //ctx.strokeRect(x, yi, barWidth, altered_height);
-                            //console.log(percent - last_percent, y, altered_height);
-                        } });
+            if (percent < 1 && !last_percent_is_invalid) {
+                render_data.push({ color: rec.color, render_fun: () => {
+                        const altered_height = (percent - last_percent) * o_barHeight;
+                        //const yi = y//Math.ceil(y);
+                        ctx.fillRect(x, y, barWidth, altered_height);
+                        //ctx.strokeRect(x, yi, barWidth, altered_height);
+                        //console.log(percent - last_percent, y, altered_height);
+                    } });
             }
             else {
                 render_data.push({ color: rec.color, render_fun: () => {
@@ -274,24 +268,30 @@ export function make_histogram(container, width, height, data, auto_resize = tru
             let last_percent = 0;
             let last_whole_percent = 0;
             draw(last_percent, true);
-            const intervalId = setInterval(() => {
+            const animate = () => {
                 let percent = (Date.now() - start_time) / total_time;
                 if (percent >= 1) {
+                    percent = 1;
+                    draw(percent, true);
+                    return;
+                }
+                draw(percent, false, last_percent);
+                last_percent = percent;
+                requestAnimationFrame(animate);
+            };
+            requestAnimationFrame(animate);
+            /*const intervalId = setInterval(() => {
+                let percent = (Date.now() - start_time) / total_time;
+                if (percent >= 1)
+                {
                     percent = 1;
                     clearInterval(intervalId);
                     draw(percent, true);
                     return true;
                 }
                 draw(percent, false, last_percent);
-                //console.log(percent, last_percent)
-                /*if (Math.floor(last_percent * 100) > Math.floor(last_whole_percent * 100))
-                {
-                    //console.log(Math.ceil(percent * 100) / 100, false, last_whole_percent);
-                    draw(Math.ceil(percent * 100) / 100, false, last_whole_percent);
-                    last_whole_percent = Math.floor(last_percent * 100) / 100;
-                }*/
                 last_percent = percent;
-            }, frame_time);
+            }, frame_time);*/
             return true;
         }
         return draw(1, true);
