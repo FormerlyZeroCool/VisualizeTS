@@ -38,7 +38,8 @@ export function render_donut(canvas, data) {
     const x = width / 2;
     const y = height / 2;
     const radius = Math.min(height, width) / 3;
-    ctx.lineWidth = (width - (x + radius));
+    const vw = (vw) => width / 100 * vw;
+    ctx.lineWidth = vw(6);
     setup_text(ctx, width, height);
     const normalized = normalize_records(data);
     let start = Math.PI;
@@ -64,19 +65,20 @@ export function make_donut(container, width, height, data) {
     keyDiv.style.flexDirection = 'column';
     keyDiv.style.marginLeft = '20px';
     // Populate the key with labels and colors
+    const font_size = width / 100 * 3.5;
     data.forEach(record => {
         const keyItem = document.createElement('div');
         keyItem.style.display = 'flex';
         keyItem.style.alignItems = 'center';
         const colorBox = document.createElement('div');
-        colorBox.style.width = `${width / 10}px`;
-        colorBox.style.height = `${width / 10}px`;
+        colorBox.style.width = `${font_size * 1.5}px`;
+        colorBox.style.height = `${font_size * 1.5}px`;
         colorBox.style.backgroundColor = record.color;
         colorBox.style.marginRight = '10px';
         colorBox.style.border = '1px solid #000'; // Add black border
         const label = document.createElement('span');
         label.textContent = record.label;
-        label.style.fontSize = `${width / 15}px`;
+        label.style.fontSize = `${font_size}px`;
         keyItem.appendChild(colorBox);
         keyItem.appendChild(label);
         keyDiv.appendChild(keyItem);

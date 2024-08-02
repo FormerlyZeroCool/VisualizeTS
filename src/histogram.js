@@ -249,16 +249,6 @@ export function make_histogram(container, width, height, data, auto_resize = tru
         keyDiv.style.width = `${keyDivCalcedWidth}px`;
         canvas.width = Math.max(10, width - yAxisDiv.clientWidth - keyDivCalcedWidth);
         canvas.height = height;
-        /*
-        console.log(
-            keyDiv.style.width, "\ncalc canvas:",
-            width - yAxisDiv.clientWidth - keyDiv.clientWidth,
-            "\nraw:", width,
-            "\nyadiv:", yAxisDiv.clientWidth,
-            "\nkeydiv:", keyDiv.clientWidth,
-            "\ncanvas:", canvas.width
-        );*/
-        //containerDiv.style.border = "thick ridge rgba(0, 0, 0, 0.25)";
         const draw = (percent, render_text, last_percent = -1) => render_histogram(canvas, data, labels_config.fontSize, labels_config.y_intervals, range, heightOffset, percent, render_text, last_percent);
         if (first_render) {
             first_render = false;
@@ -280,21 +270,9 @@ export function make_histogram(container, width, height, data, auto_resize = tru
                 requestAnimationFrame(animate);
             };
             requestAnimationFrame(animate);
-            /*const intervalId = setInterval(() => {
-                let percent = (Date.now() - start_time) / total_time;
-                if (percent >= 1)
-                {
-                    percent = 1;
-                    clearInterval(intervalId);
-                    draw(percent, true);
-                    return true;
-                }
-                draw(percent, false, last_percent);
-                last_percent = percent;
-            }, frame_time);*/
             return true;
         }
-        return draw(1, true);
+        return draw(1, false);
     };
     if (auto_resize)
         window.addEventListener('resize', render);
