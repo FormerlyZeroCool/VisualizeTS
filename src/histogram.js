@@ -1,6 +1,7 @@
 ;
 ;
 ;
+;
 function normalize_records(records, range) {
     const normalized = records.map((grouped_record) => {
         return { ...grouped_record,
@@ -74,6 +75,7 @@ export function render_histogram(canvas, data, fontSize, y_intervals, range, hei
     const normalized = normalize_records(data, range);
     const groupSpacing = width / data.length;
     const groupWidth = groupSpacing / 1.5;
+    const barWidth = groupWidth / (normalized[0].data.length);
     const last_percent_is_invalid = percent >= 1 || last_percent > percent || last_percent < 0 || last_percent > 1;
     let last_label_end = -1;
     if (last_percent_is_invalid) {
@@ -92,11 +94,16 @@ export function render_histogram(canvas, data, fontSize, y_intervals, range, hei
     }
     //render bars, and labels
     ctx.strokeStyle = "rgba(255, 255, 255, 0.25)";
+    const group_x = (i) => (i + 0.5) * groupSpacing - groupWidth / 2;
+    const x_to_index = (x) => {
+        const gi = (x + groupWidth / 2) / groupSpacing - 0.5;
+        const bi = (x - group_x(Math.floor(gi))) / barWidth;
+        return { group_index: gi, bar_index: bi };
+    };
     const render_data = [];
     for (let i = 0; i < normalized.length; i++) {
         const normals = normalized[i];
-        const groupX = (i + 0.5) * groupSpacing - groupWidth / 2;
-        const barWidth = groupWidth / (normalized[0].data.length);
+        const groupX = group_x(i);
         for (let j = 0; j < normals.data.length; j++) {
             const rec = normals.data[j];
             const o_barHeight = rec.normal * height;
@@ -108,10 +115,7 @@ export function render_histogram(canvas, data, fontSize, y_intervals, range, hei
             if (percent < 1 && !last_percent_is_invalid) {
                 render_data.push({ color: rec.color, render_fun: () => {
                         const altered_height = (percent - last_percent) * o_barHeight;
-                        //const yi = y//Math.ceil(y);
                         ctx.fillRect(x, y, barWidth, altered_height);
-                        //ctx.strokeRect(x, yi, barWidth, altered_height);
-                        //console.log(percent - last_percent, y, altered_height);
                     } });
             }
             else {
@@ -143,7 +147,7 @@ export function render_histogram(canvas, data, fontSize, y_intervals, range, hei
         rec.render_fun();
     });
     ctx.strokeRect(0, 0, width, height);
-    return true;
+    return x_to_index;
 }
 function createYAxisLabels(range, height, precision, intervals, font, fontSize, heightOffset) {
     const yAxisDiv = document.createElement('div');
@@ -172,7 +176,6 @@ export function make_histogram(container, width, height, data, auto_resize = tru
     const original_height = height;
     const original_fontSize = ((labels_config.fontSize) < 0 ? Math.max(8, width / 80) : labels_config.fontSize);
     labels_config.fontSize = original_fontSize;
-    let first_render = true;
     if (Math.abs(range.y_min) === Infinity)
         range.y_min = 0;
     if (Math.abs(range.y_max) === Infinity)
@@ -188,6 +191,7 @@ export function make_histogram(container, width, height, data, auto_resize = tru
         data.forEach((cur) => max = max < ctx.measureText(cur.label).width ? ctx.measureText(cur.label).width : max);
         return max;
     };
+    let first_render = true;
     const render = () => {
         container.innerHTML = '';
         width = original_width * ratio_w();
@@ -249,14 +253,36 @@ export function make_histogram(container, width, height, data, auto_resize = tru
         canvas.width = Math.max(10, width - yAxisDiv.clientWidth - keyDivCalcedWidth);
         canvas.height = height;
         const draw = (percent, render_text, last_percent = -1) => render_histogram(canvas, data, labels_config.fontSize, labels_config.y_intervals, range, heightOffset, percent, render_text, last_percent);
+        const set_event_listener = (maybe_x_to_index) => {
+            if (maybe_x_to_index !== false) {
+                const x_to_index = maybe_x_to_index;
+                canvas.addEventListener("mouseup", (ev) => {
+                    const bar_location_data = x_to_index(ev.offsetX);
+                    const gi = bar_location_data.group_index;
+                    if (gi < 0 || gi >= data.length)
+                        return;
+                    const bar_index = Math.floor(gi);
+                    window.location.href = data[bar_index].link;
+                });
+                canvas.addEventListener("mousemove", (ev) => {
+                    const bar_location_data = x_to_index(ev.offsetX);
+                    const gi = bar_location_data.group_index;
+                    const bi = bar_location_data.bar_index;
+                    console.log(gi, bi);
+                });
+            }
+            else {
+                canvas.addEventListener("mouseup", () => { });
+                canvas.addEventListener("mousemove", () => { });
+            }
+        };
         if (first_render) {
             first_render = false;
             const total_time = 300;
             const start_time = Date.now();
-            const frame_time = 8;
             let last_percent = 0;
-            let last_whole_percent = 0;
-            draw(last_percent, true);
+            const maybe_x_to_index = draw(last_percent, true);
+            set_event_listener(maybe_x_to_index);
             const animate = () => {
                 let percent = (Date.now() - start_time) / total_time;
                 if (percent >= 1) {
@@ -271,7 +297,9 @@ export function make_histogram(container, width, height, data, auto_resize = tru
             requestAnimationFrame(animate);
             return true;
         }
-        return draw(1, false);
+        let maybe_x_to_index = draw(1, false);
+        set_event_listener(maybe_x_to_index);
+        return maybe_x_to_index !== false;
     };
     if (auto_resize)
         window.addEventListener('resize', render);

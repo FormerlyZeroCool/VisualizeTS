@@ -27,6 +27,7 @@ async function main() {
     //make_donut(div, 500, 500, donut_data);
     const histogram_data = JSON.parse(`[{
         "label": "ENG 201",
+        "link": "http://sprite-creator.com/web",
         "data": [{
             "label": "Total Count of the Class",
             "color": "rgba(0,0,0,0.25)",
@@ -38,6 +39,7 @@ async function main() {
         }]
     }, {
         "label": "SPE 100",
+        "link": "http://sprite-creator.com/web",
         "data": [{
             "label": "Total Count of the Class",
             "color": "#00FF00",
@@ -49,6 +51,7 @@ async function main() {
         }]
     }, {
         "label": "CIS 100",
+        "link": "http://sprite-creator.com/web",
         "data": [{
             "label": "Total Count of the Class",
             "color": "#00FF00",
@@ -60,6 +63,7 @@ async function main() {
         }]
     }, {
         "label": "ACC 122",
+        "link": "http://sprite-creator.com/web",
         "data": [{
             "label": "Total Count of the Class",
             "color": "#00FF00",
@@ -71,6 +75,7 @@ async function main() {
         }]
     }, {
         "label": "ENG 101",
+        "link": "http://sprite-creator.com/web",
         "data": [{
             "label": "Total Count of the Class",
             "color": "#00FF00",
@@ -82,6 +87,7 @@ async function main() {
         }]
     }, {
         "label": "CRT 100",
+        "link": "http://sprite-creator.com/web",
         "data": [{
             "label": "Total Count of the Class",
             "color": "#00FF00",
@@ -93,6 +99,7 @@ async function main() {
         }]
     }, {
         "label": "BUS 104",
+        "link": "http://sprite-creator.com/web",
         "data": [{
             "label": "Total Count of the Class",
             "color": "#00FF00",
@@ -104,6 +111,7 @@ async function main() {
         }]
     }, {
         "label": "SOC 100",
+        "link": "http://bricks.warforts.com",
         "data": [{
             "label": "Total Count of the Class",
             "color": "#00FF00",
@@ -115,6 +123,7 @@ async function main() {
         }]
     }, {
         "label": "MAT 206.5",
+        "link": "http://warforts.com",
         "data": [{
             "label": "Total Count of the Class",
             "color": "#00FF00",
@@ -126,6 +135,7 @@ async function main() {
         }]
     }, {
         "label": "MAT 150",
+        "link": "http://break.warforts.com",
         "data": [{
             "label": "Total Count of the Class",
             "color": "#00FF00",
@@ -138,7 +148,7 @@ async function main() {
     }]`);
     for (let i = 0; i < 10; i++)
         histogram_data.push(histogram_data[i]);
-    histogram_data.splice(2, 19);
+    histogram_data.splice(10, 19);
     const histogram_data1 = [{ "label": "", "data": [{ "label": "Correct answers over time", "color": "#000080", "data": 100 }] }, { "label": "", "data": [{ "label": "Correct answers over time", "color": "#000080", "data": 100 }] }, { "label": "", "data": [{ "label": "Correct answers over time", "color": "#000080", "data": 100 }] }, { "label": "", "data": [{ "label": "Correct answers over time", "color": "#000080", "data": 100 }] }, { "label": "", "data": [{ "label": "Correct answers over time", "color": "#000080", "data": 100 }] }, { "label": "", "data": [{ "label": "Correct answers over time", "color": "#000080", "data": 100 }] }, { "label": "", "data": [{ "label": "Correct answers over time", "color": "#000080", "data": 100 }] }, { "label": "", "data": [{ "label": "Correct answers over time", "color": "#000080", "data": 100 }] }];
     make_histogram(div, window.innerWidth, window.innerHeight * 0.95, histogram_data, true, { y_precision: -1, y_intervals: 11, fontSize: -1 }, { y_min: 0, y_max: 110 });
 }
