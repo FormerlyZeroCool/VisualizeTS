@@ -4,6 +4,7 @@ export interface DataRecord {
     label:string;
     color:string;
     data:number;
+    get_stats:(() => string[]) | undefined;
 }
 export interface GroupedRecord {
     label:string;
@@ -155,8 +156,13 @@ export function render_histogram(canvas:HTMLCanvasElement, data:GroupedRecord[],
     ctx.strokeStyle = "rgba(255, 255, 255, 0.25)";
     const group_x = (i:number) => (i + 0.5) * groupSpacing - groupWidth / 2;
     const x_to_index = (x:number) => {
-        const gi = (x + groupWidth / 2) / groupSpacing - 0.5;
-        const bi = (x - group_x(Math.floor(gi))) / barWidth;
+        let gi = (x + groupWidth / 2) / groupSpacing - 0.5;
+        gi = gi >= 0 && gi < data.length ? Math.floor(gi) : 0;
+        let bi = (x - group_x(Math.floor(gi))) / barWidth;
+        // lower bound bi
+        bi = gi !== -1 && bi >= 0 ? Math.floor(bi) : 0;
+        // upper bound bi
+        bi = gi !== -1 && bi < data[gi].data.length ? bi : data[gi].data.length - 1;
         return {group_index:gi, bar_index:bi};
     };
     const render_data:RenderStruct[] = [];
@@ -354,9 +360,7 @@ export function make_histogram(container: HTMLDivElement, width: number, height:
                     <((x:number) => BarLocationData)> maybe_x_to_index;
                 canvas.addEventListener("mouseup", (ev:MouseEvent) => {
                     const bar_location_data:BarLocationData = x_to_index(ev.offsetX);
-                    const gi = bar_location_data.group_index;
-                    const bar_index = Math.floor(gi);
-                    window.location.href = data[bar_index].link;
+                    window.location.href = data[bar_location_data.group_index].link;
                 });
                 canvas.addEventListener("mousemove", (ev:MouseEvent) => {
                     const bar_location_data:BarLocationData = x_to_index(ev.offsetX);

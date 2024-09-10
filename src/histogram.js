@@ -96,8 +96,13 @@ export function render_histogram(canvas, data, fontSize, y_intervals, range, hei
     ctx.strokeStyle = "rgba(255, 255, 255, 0.25)";
     const group_x = (i) => (i + 0.5) * groupSpacing - groupWidth / 2;
     const x_to_index = (x) => {
-        const gi = (x + groupWidth / 2) / groupSpacing - 0.5;
-        const bi = (x - group_x(Math.floor(gi))) / barWidth;
+        let gi = (x + groupWidth / 2) / groupSpacing - 0.5;
+        gi = gi >= 0 && gi < data.length ? Math.floor(gi) : 0;
+        let bi = (x - group_x(Math.floor(gi))) / barWidth;
+        // lower bound bi
+        bi = gi !== -1 && bi >= 0 ? Math.floor(bi) : 0;
+        // upper bound bi
+        bi = gi !== -1 && bi < data[gi].data.length ? bi : data[gi].data.length - 1;
         return { group_index: gi, bar_index: bi };
     };
     const render_data = [];
@@ -258,17 +263,13 @@ export function make_histogram(container, width, height, data, auto_resize = tru
                 const x_to_index = maybe_x_to_index;
                 canvas.addEventListener("mouseup", (ev) => {
                     const bar_location_data = x_to_index(ev.offsetX);
-                    const gi = bar_location_data.group_index;
-                    if (gi < 0 || gi >= data.length)
-                        return;
-                    const bar_index = Math.floor(gi);
-                    window.location.href = data[bar_index].link;
+                    window.location.href = data[bar_location_data.group_index].link;
                 });
                 canvas.addEventListener("mousemove", (ev) => {
                     const bar_location_data = x_to_index(ev.offsetX);
                     const gi = bar_location_data.group_index;
                     const bi = bar_location_data.bar_index;
-                    console.log(gi, bi);
+                    //console.log(gi, bi);
                 });
             }
             else {
